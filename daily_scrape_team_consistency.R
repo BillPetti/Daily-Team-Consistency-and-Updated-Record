@@ -57,6 +57,20 @@ standings<-standings %>% arrange(desc(`W%`))
 
 names(standings)<-c("Team", "G", "W", "L","W%", "RDif", "RS/G", "RA/G", "PythagenPat W%", "Wins Above/Below Pythag", "BaseRuns W%", "Wins Above/Below BaseRuns")
 
+#transform columns to numeric
+
+attach(standings)
+standings$L %>% as.numeric()
+standings$`W%` <- standings$`W%` %>% as.numeric()
+standings$RDif <- RDif %>% as.numeric()
+standings$`RS/G` <- `RS/G` %>% as.numeric()
+standings$`RA/G` <- `RA/G` %>% as.numeric()
+standings$`PythagenPat W%`<- `PythagenPat W%` %>% as.numeric()
+standings$`Wins Above/Below Pythag` <- `Wins Above/Below Pythag` %>% as.numeric()
+standings$`BaseRuns W%` <- `BaseRuns W%` %>% as.numeric()
+standings$`Wins Above/Below BaseRuns` <- `Wins Above/Below BaseRuns` %>% as.numeric()
+detach(standings)
+
 #create match table for BRef and FanGraphs team names
 
 fg_t<-c("Diamondbacks", "Braves", "Orioles", "Red Sox", "Cubs", "White Sox", "Reds", "Indians", "Rockies", "Tigers", "Astros", "Royals", "Angels", "Dodgers", "Marlins", "Brewers", "Twins", "Mets", "Yankees", "Athletics", "Phillies", "Pirates", "Padres", "Mariners", "Giants", "Cardinals", "Rays", "Rangers", "Blue Jays", "Nationals")
@@ -85,19 +99,9 @@ VOL$RA_Ptile<-round(VOL$RA_Ptile, 2)
 standings<-left_join(standings, teams, by = c("Team" = "FG_teams"))
 standings<-left_join(standings, VOL, by = "bref_t")
 
-#transform columns to numeric
-
-attach(standings)
-standings$L %>% as.numeric()
-standings$`W%` <- standings$`W%` %>% as.numeric()
-standings$RDif <- RDif %>% as.numeric()
-standings$`RS/G` <- `RS/G` %>% as.numeric()
-standings$`RA/G` <- `RA/G` %>% as.numeric()
-standings$`PythagenPat W%`<- `PythagenPat W%` %>% as.numeric()
-standings$`Wins Above/Below Pythag` <- `Wins Above/Below Pythag` %>% as.numeric()
-standings$`BaseRuns W%` <- `BaseRuns W%` %>% as.numeric()
-standings$`Wins Above/Below BaseRuns` <- `Wins Above/Below BaseRuns` %>% as.numeric()
-detach(standings)
+#normalize VOL scores
+standings$`R_VOL+`<-round((standings$R/mean(standings$R)),2)*100
+standings$`RA_VOL+`<-round((standings$RA/mean(standings$RA)),2)*100
 
 #plot R vs. RA volatility (percentiles)
 
@@ -105,5 +109,6 @@ require(ggplot2)
 
 g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t)) 
 g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
+g<- g + geom_hline(yintercept=.75) + geom_vline(xintercept=.75)
+g<- g + xlab("Runs Scored Volatiltiy (Percentile)") + ylab("Runs Allowed Volatilit (Percentile")
 g
-
