@@ -87,12 +87,15 @@ colnames(VOL)[1]<-"bref_t"
 
 #calculate percentiles for each team for both R and RA.
 
-VOL<-VOL %>% mutate(percrank = rank(-R)/length(R))
+VOL<-VOL %>% mutate(percrank = rank(R)/length(R))
 colnames(VOL)[4]<-"R_Ptile"
 VOL<-VOL %>% mutate(percrank = rank(RA)/length(RA))
 colnames(VOL)[5]<-"RA_Ptile"
-VOL$R_Ptile<-round(VOL$R_Ptile, 2)
-VOL$RA_Ptile<-round(VOL$RA_Ptile, 2)
+
+#round and multiple each percentile by 100 
+
+VOL$R_Ptile<-round(VOL$R_Ptile, 2)*100
+VOL$RA_Ptile<-round(VOL$RA_Ptile, 2)*100
 
 #join VOL scores to standings, via the teams table
 
@@ -109,6 +112,7 @@ require(ggplot2)
 
 g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t)) 
 g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
-g<- g + geom_hline(yintercept=.75) + geom_vline(xintercept=.75)
+g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
 g<- g + xlab("Runs Scored Volatiltiy (Percentile)") + ylab("Runs Allowed Volatilit (Percentile")
 g
+  
