@@ -119,4 +119,5 @@ g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
 g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
 g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
 g
+
   
