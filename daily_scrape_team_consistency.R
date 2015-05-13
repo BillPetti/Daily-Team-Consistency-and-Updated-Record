@@ -106,13 +106,17 @@ standings<-left_join(standings, VOL, by = "bref_t")
 standings$`R_VOL+`<-round((standings$R/mean(standings$R)),2)*100
 standings$`RA_VOL+`<-round((standings$RA/mean(standings$RA)),2)*100
 
+#export standings file as csv for ploting, etc. 
+
+standings %>% write.csv(file="standings.csv")
+
 #plot R vs. RA volatility (percentiles)
 
 require(ggplot2)
 
-g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t)) 
-g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
+g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
+g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
 g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
-g<- g + xlab("Runs Scored Volatiltiy (Percentile)") + ylab("Runs Allowed Volatilit (Percentile")
+g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
 g
   
