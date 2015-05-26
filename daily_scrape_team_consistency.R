@@ -28,9 +28,11 @@ results_2015<-teams %>% group_by(Tm) %>% do(scrape_results(.))
 cols<-c(3:5, 9:10)
 results_2015<-results_2015[,cols]
 names(results_2015)<-c("Date", "box", "Team", "R", "RA")
+#clean up some attributes left over from scraping the data from B-REF
+attr(results_2015, "vars")<-NULL
 results_2015<-filter(results_2015, box=="boxscore")
 
-#conert R and RA columns to numeric
+#convert R and RA columns to numeric
 
 results_2015$R<-as.numeric(results_2015$R)
 results_2015$RA<-as.numeric(results_2015$RA)
@@ -115,7 +117,7 @@ standings %>% write.csv(file="standings.csv")
 require(ggplot2)
 
 g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
-g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
+g<-g + geom_text(aes(colour=factor(`PythagenPat W%`))) 
 g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
 g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
 g
