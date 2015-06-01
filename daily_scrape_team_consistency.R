@@ -105,8 +105,19 @@ standings<-left_join(standings, teams, by = c("Team" = "FG_teams"))
 standings<-left_join(standings, VOL, by = "bref_t")
 
 #normalize VOL scores
+
 standings$`R_VOL+`<-round((standings$R/mean(standings$R)),2)*100
 standings$`RA_VOL+`<-round((standings$RA/mean(standings$RA)),2)*100
+
+#create dummy variables to categorize teams in terms of whether they are optimized for each of the volatility metrics
+
+standings$RA_75<-ifelse(standings$RA_Ptile >= 75, 1, 0)
+standings$R_25<-ifelse(standings$R_Ptile <= 25, 1, 0)
+standings$Optimal<-ifelse(standings$R_Ptile <= 25 & standings$RA_Ptile >= 75, 1, 0)
+
+#view averege wins above/below pythag expectation based on optimization
+
+aggregate(`Wins Above/Below Pythag`~RA_75 + R_25, standings, mean)
 
 #export standings file as csv for ploting, etc. 
 
