@@ -62,7 +62,7 @@ names(standings)<-c("Team", "G", "W", "L","W%", "RDif", "RS/G", "RA/G", "Pythage
 #transform columns to numeric
 
 attach(standings)
-standings$L %>% as.numeric()
+standings$L <- standings$L %>% as.numeric()
 standings$`W%` <- standings$`W%` %>% as.numeric()
 standings$RDif <- RDif %>% as.numeric()
 standings$`RS/G` <- `RS/G` %>% as.numeric()
@@ -117,17 +117,24 @@ standings$Optimal<-ifelse(standings$R_Ptile <= 25 & standings$RA_Ptile >= 75, 1,
 
 #view averege wins above/below pythag expectation based on optimization
 
-aggregate(`Wins Above/Below Pythag`~RA_75 + R_25, standings, mean)
+mean_by_vol_combo<-round(aggregate(`Wins Above/Below Pythag`~RA_75 + R_25, standings, mean),1)
+mean_by_vol_combo
 
-#export standings file as csv for ploting, etc. 
+#view correlation between runs scored and allowed per game and respectively volatility scores
+
+cor(standings$`RA/G`, standings$RA_Ptile)
+cor(standings$`RS/G`, standings$R_Ptile)
+
+#export standings and results files as csv for ploting, etc. 
 
 standings %>% write.csv(file="standings.csv")
+results_2015 %>% write.csv(file="results.csv")
 
 #plot R vs. RA volatility (percentiles)
 
 require(ggplot2)
 
-g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
+g<-ggplot(standings, aes(x=RA/G_Ptile, y=RA_Ptile, label=bref_t))
 g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
 g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
 g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
