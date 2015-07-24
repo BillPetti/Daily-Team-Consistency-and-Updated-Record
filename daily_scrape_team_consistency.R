@@ -134,7 +134,7 @@ results_2015 %>% write.csv(file="results.csv")
 
 require(ggplot2)
 
-g<-ggplot(standings, aes(x=RA/G_Ptile, y=RA_Ptile, label=bref_t))
+g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
 g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
 g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
 g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
