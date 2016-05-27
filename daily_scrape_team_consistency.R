@@ -6,14 +6,14 @@ require(dplyr)
 #create table of team abbreviations
 
 teams<-readHTMLTable("http://www.baseball-reference.com/leagues/MLB/2015.shtml", stringsAsFactors=FALSE)
-teams<-teams[[1]]
+teams<-teams[[2]]
 teams<-select(teams, Tm)
 teams<-filter(teams, Tm!="LgAvg")
 
 #create function for scraping all records for all teams in 2015
 
 scrape_results<-function(Tm) {
-  url <- paste0("http://www.baseball-reference.com/teams/", Tm, "/2015-schedule-scores.shtml")
+  url <- paste0("http://www.baseball-reference.com/teams/", Tm, "/2016-schedule-scores.shtml")
   data <- readHTMLTable(url, stringsAsFactors = FALSE)
   data <- data[[6]]
   data
@@ -117,8 +117,11 @@ standings$Optimal<-ifelse(standings$R_Ptile <= 25 & standings$RA_Ptile >= 75, 1,
 
 #view averege wins above/below pythag expectation based on optimization
 
-mean_by_vol_combo<-round(aggregate(`Wins Above/Below Pythag`~RA_75 + R_25, standings, mean),1)
-mean_by_vol_combo
+pythag_mean_by_vol_combo<-round(aggregate(`Wins Above/Below Pythag`~RA_75 + R_25, standings, mean),1)
+pythag_mean_by_vol_combo
+
+baseruns_mean_by_vol_combo<-round(aggregate(`Wins Above/Below BaseRuns`~RA_75 + R_25, standings, mean),1)
+baseruns_mean_by_vol_combo
 
 #view correlation between runs scored and allowed per game and respectively volatility scores
 
@@ -134,8 +137,26 @@ results_2015 %>% write.csv(file="results.csv")
 
 require(ggplot2)
 
-g<-ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
-g<-g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
-g<- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
-g<- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)")
+g <- ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
+g <- g + geom_text(aes(colour=factor(`Wins Above/Below Pythag`))) 
+g <- g + geom_hline(yintercept=75) + geom_vline(xintercept=25)
+g <- g + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)") + theme_bp_grey()
 g
+
+b <- ggplot(standings, aes(x=R_Ptile, y=RA_Ptile, label=bref_t))
+b <- b + geom_text(aes(colour=factor(`Wins Above/Below BaseRuns`))) 
+b <- b + geom_hline(yintercept=75) + geom_vline(xintercept=25)
+b <- b + xlab("Runs Scored Volatiltiy (Percentile--lower is better)") + ylab("Runs Allowed Volatility (Percentile--higher is better)") + theme_bp_grey()
+b
+
+#plot R vs. R_VOL
+
+r <-ggplot(standings, aes(x=`RS/G`, y=R_Ptile, label=bref_t))
+r <- r + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
+r
+
+#plot RA vs. RA_VOL
+
+ra <-ggplot(standings, aes(x=`RA/G`, y=RA_Ptile, label=bref_t))
+ra <- ra + geom_text(aes(colour=factor(`Wins Above/Below Pythag`)))
+ra
